@@ -3,7 +3,7 @@
 # 
 - Create an EC2 Server (ubuntu) and connect to that Server.
 ## Backend  Deployment 
-- Clone the  frontend of application (GroceryAppBE) from GitHub.
+- Clone the  backend of application (GroceryAppBE) from GitHub.
 ```
 git clone https://github.com/AnupDudhe/GroceryAppBE-.git
 ```
