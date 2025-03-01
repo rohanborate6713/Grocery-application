@@ -3,7 +3,7 @@
 # 
 - Create an EC2 Server (ubuntu) and connect to that Server.
 ## Backend  Deployment 
-- Clone the  backend of application (GroceryAppBE) from GitHub.
+- Clone the  frontend of application (GroceryAppBE) from GitHub.
 ```
 git clone https://github.com/AnupDudhe/GroceryAppBE-.git
 ```
@@ -136,11 +136,11 @@ use grocerydb
 
 #### Install pm2 for daemon service running on server
 - **PM2** (Process Manager 2) is a **production-grade process manager** for Node.js applications. It helps you:
-- ✅ **Keep applications running continuously** (auto-restart on crashes).
-✅ **Manage multiple applications** with process monitoring.
-✅ **Auto-restart on system reboot**.
-✅ **Log and monitor CPU/memory usage**.
-✅ **Run apps in the background** (as a daemon).
+- ✅ Keep applications running continuously (auto-restart on crashes).
+✅ Manage multiple applications with process monitoring.
+✅ Auto-restart on system reboot.
+✅ Log and monitor CPU/memory usage.
+✅ Run apps in the background (as a daemon).
 ```
 sudo npm install -g pm2
 ```
@@ -252,7 +252,7 @@ http://<your-server-publicIP>:3000
 
 
 
-- remove any value from database. 
+- Remove any value from database. 
 
 
 ![image.png](https://eraser.imgix.net/workspaces/jv5HfVPGAthbbGqNH2wG/yuIy5hbLwHZ10ovGIULZ9qCXT8E3/X-Yn3sNFfqSmp6Bd_06ub.png?ixlib=js-3.7.0 "image.png")
@@ -266,15 +266,130 @@ http://<your-server-publicIP>:3000
 
 ---
 
-## Deploy same application on nginx
+## Deploy frontend of  Grocery-application on nginx
 
 
-- Our application backend service is already running
+- Our application backend service is already running in background, if not running please start 
 - we are deploying frontend with nginx
-- to deploy the application need to create build using npm
+
+
+#### Nginx Installation
+```
+sudo apt update
+sudo apt install nginx -y
+```
+![image.png](https://eraser.imgix.net/workspaces/jv5HfVPGAthbbGqNH2wG/yuIy5hbLwHZ10ovGIULZ9qCXT8E3/6aWCp_ZDWFyd2KxYzKfke.png?ixlib=js-3.7.0 "image.png")
+
+- check nginx is installed or not 
+```
+nginx --version
+```
+![image.png](https://eraser.imgix.net/workspaces/jv5HfVPGAthbbGqNH2wG/yuIy5hbLwHZ10ovGIULZ9qCXT8E3/Gf2-3XqYQ9rD0uBp3SSdw.png?ixlib=js-3.7.0 "image.png")
+
+
+
+Deploy a Frontend Build
+
+- Now go to frontend app folder 
+- To deploy the application need to create build using npm
 ```
 ﻿cd GroceryAppFE/
 npm run build 
 ```
+![image.png](https://eraser.imgix.net/workspaces/jv5HfVPGAthbbGqNH2wG/yuIy5hbLwHZ10ovGIULZ9qCXT8E3/WHHKQ3sN4zBeG9OfH1Z31.png?ixlib=js-3.7.0 "image.png")
+
+- build folder is created
+
+
+- If your build contains **static files** (e.g., `index.html` , `.js` , `.css` ), you can serve them directly via Nginx.
+![image.png](https://eraser.imgix.net/workspaces/jv5HfVPGAthbbGqNH2wG/yuIy5hbLwHZ10ovGIULZ9qCXT8E3/oXmg230MioD2IDyY9By_V.png?ixlib=js-3.7.0 "image.png")
+
+
+
+- Moves build files to    `﻿var/www/html` 
+- it's the **default root directory** for websites served by **Nginx** or **Apache**.
+- By placing the build in `/var/www/grocery-app`  , we ensure Nginx can access and serve the files.
+#### Why Not Serve from Any other Directory?
+- **Permissions**: Nginx runs as a system user (`www-data` ), so it needs access to the files.
+- **Security**: Keeping site files in `/var/www/`  is a best practice.
+- **Ease of Management**: Standard location for hosting static sites.
+
+
+```
+sudo mkdir -p /var/www/grocery-app
+```
+```
+sudo cp -r build/* /var/www/grocery-app/
+```
+![image.png](https://eraser.imgix.net/workspaces/jv5HfVPGAthbbGqNH2wG/yuIy5hbLwHZ10ovGIULZ9qCXT8E3/x3irrGPK00RXRNwRm8bte.png?ixlib=js-3.7.0 "image.png")
+
+
+
+Configure Nginx
+
+- Edit the Nginx config file:    --> /etc/nginx/sites-available/grocery-ap
+- Nginx **doesn't know** where to serve files from by default.
+Editing the config file allows us to:
+    1. **Tell Nginx where the files are located** (`root /var/www/grocery-app;` ).
+    2. **Define how to handle requests** (`try_files $uri /index.html;` ).
+    3. **Enable Reverse Proxy (For Backends)** → Forwarding requests to a Node.js backend.
+```
+sudo vim /etc/nginx/sites-available/grocery-app
+```
+- add below server configuration in it 
+- Replace  `your_domain_or_ip`  with your server public IP or domain name
+```
+server {
+    listen 80;
+    server_name your_domain_or_ip;   #- Replace  `your_domain_or_ip`  with your server public IP or domain name
+
+    root /var/www/grocery-app;
+    index index.html;
+    
+    location / {
+        try_files $uri /index.html;
+    }
+}
+```
+![image.png](https://eraser.imgix.net/workspaces/jv5HfVPGAthbbGqNH2wG/yuIy5hbLwHZ10ovGIULZ9qCXT8E3/7EgAtt7fHhunnUOqr79DK.png?ixlib=js-3.7.0 "image.png")
+
+- save and exit 
+
+
+Enable Configuration & Restart Nginx
+
+```
+sudo ln -s /etc/nginx/sites-available/grocery-app /etc/nginx/sites-enabled/
+```
+```
+sudo nginx -t 
+```
+![image.png](https://eraser.imgix.net/workspaces/jv5HfVPGAthbbGqNH2wG/yuIy5hbLwHZ10ovGIULZ9qCXT8E3/fQ4lp4oWkEXGaq_wS9dHG.png?ixlib=js-3.7.0 "image.png")
+
+```
+sudo systemctl restart nginx
+```
+![image.png](https://eraser.imgix.net/workspaces/jv5HfVPGAthbbGqNH2wG/yuIy5hbLwHZ10ovGIULZ9qCXT8E3/n8nZRe2BI-SXtvkP-3TrU.png?ixlib=js-3.7.0 "image.png")
+
+
+
+- Your frontend is now deployed on Nginx...
+- open your browser and then put your server public IP and check ,our application is deployed on nginx
+
+
+![image.png](https://eraser.imgix.net/workspaces/jv5HfVPGAthbbGqNH2wG/yuIy5hbLwHZ10ovGIULZ9qCXT8E3/FtiafCOGbLylfd7K9hkXZ.png?ixlib=js-3.7.0 "image.png")
+
+
+
+- Add some items in grocery list to check functionally it is working or not 
+
+
+![image.png](https://eraser.imgix.net/workspaces/jv5HfVPGAthbbGqNH2wG/yuIy5hbLwHZ10ovGIULZ9qCXT8E3/LyltbDtMXNh2kTd7NuGnL.png?ixlib=js-3.7.0 "image.png")
+
+
+
+-  connect to database and check , it is updated correctly .
+![image.png](https://eraser.imgix.net/workspaces/jv5HfVPGAthbbGqNH2wG/yuIy5hbLwHZ10ovGIULZ9qCXT8E3/lL8W-ZmAllUfsvO10ltLT.png?ixlib=js-3.7.0 "image.png")
+
 
 
