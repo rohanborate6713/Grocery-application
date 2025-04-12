@@ -98,6 +98,18 @@ mongod --version
 ```
 ![image.png](https://eraser.imgix.net/workspaces/jv5HfVPGAthbbGqNH2wG/yuIy5hbLwHZ10ovGIULZ9qCXT8E3/WE3Dp3hBzStP19BIp-1DS.png?ixlib=js-3.7.0 "image.png")
 
+
+
+```
+https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/
+once mongodb is installed ensure you make a change in /etc/mongod.conf
+vim /etc/mongod.conf
+ensure you make this change in the configuration file
+# network interfaces
+net:
+  port: 27017
+  bindIp: 0.0.0.0
+```
 - start and enable the mongodb database service
 ```
 systemctl status mongod
@@ -130,6 +142,28 @@ use grocerydb
 
 - currently we don' t have any data in database
 - to exit from the database use `﻿exit`  command
+
+
+- If your database hosted on another server , then try to get access from your server to database server
+- note --> you also required to install mongod on your server as it works as a client
+```
+mongosh "mongodb://<database_server_ip>:27017"
+```
+---
+
+#### Pre-requisite to deploy application 
+```
+npm install
+npm init -y
+npm install express mongoose cors
+npm install dotenv
+npm install portfinder
+
+########
+portfinder is a utility module in Node.js apps that helps you find an 
+available port on your machine —
+especially useful if you're not hardcoding the port number.
+```
 
 
 ---
@@ -208,6 +242,8 @@ git clone https://github.com/AnupDudhe/GroceryAppFE.git
 ```
 cd GroceryAppFE/
 ls -a 
+npm install
+npm install dotenv
 ```
 - we get the .env file update public IP with your server public Ip
 - `REACT_APP_API_URL=http://35.192.28.119:5000` 
@@ -264,6 +300,15 @@ http://<your-server-publicIP>:3000
 
 
 
+---
+
+## Deploy frontend of  Grocery-application on pm2
+```
+npm install
+npm run build
+pm2 list
+pm2 serve build/ 3000 --name "grocery-frontend" --spa
+```
 ---
 
 ## Deploy frontend of  Grocery-application on nginx
@@ -390,6 +435,21 @@ sudo systemctl restart nginx
 
 -  connect to database and check , it is updated correctly .
 ![image.png](https://eraser.imgix.net/workspaces/jv5HfVPGAthbbGqNH2wG/yuIy5hbLwHZ10ovGIULZ9qCXT8E3/lL8W-ZmAllUfsvO10ltLT.png?ixlib=js-3.7.0 "image.png")
+
+
+
+## Troubleshooting 
+- if your application is deployed but data is not added in database , or after clicking on add button 
+      you `doesn't` get any response . to check locally 
+
+```
+run npn dev
+
+chmod +x node_modules/.bin/nodemon
+
+```
+
+
 
 
 
