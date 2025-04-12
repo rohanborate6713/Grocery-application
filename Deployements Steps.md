@@ -159,6 +159,25 @@ npm install express mongoose cors
 npm install dotenv
 npm install portfinder
 
+```yaml
+######
+chnages in .env file --> 
+
+if your database is hosted on the same server as applciation is hosted then
+make below changes in .env file 
+
+MONGO_URI=mongodb://localhost:27017/grocerydb
+
+else if database server is different 
+
+MONGO_URI=mongodb://<database_server_ip>:27017/grocerydb
+
+```
+
+
+
+
+
 ########
 portfinder is a utility module in Node.js apps that helps you find an 
 available port on your machine —
@@ -242,6 +261,18 @@ git clone https://github.com/AnupDudhe/GroceryAppFE.git
 ```
 cd GroceryAppFE/
 ls -a 
+
+```
+#####
+chnages in .env file
+
+REACT_APP_API_URL=http://<your_backend_server_publicIP>:5000
+
+#####
+```
+
+
+
 npm install
 npm install dotenv
 ```
